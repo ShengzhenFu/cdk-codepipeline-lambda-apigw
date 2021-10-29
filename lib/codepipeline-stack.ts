@@ -2,6 +2,7 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CdkPipeline, SimpleSynthAction } from '@aws-cdk/pipelines';
+import { codepipelineStage } from './codepipeline-stage';
 
 export class CdkpipelinesStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -28,8 +29,10 @@ export class CdkpipelinesStack extends Stack {
       // compile typescript lambda
         buildCommand: 'npm run build'
       }),
-    })
-
+    });
+    pipeline.addApplicationStage(new codepipelineStage(this, 'deployAppStage', {
+      env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
+    }))
   }
 }
 
