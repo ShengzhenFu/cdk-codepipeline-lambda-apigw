@@ -14,7 +14,7 @@ export class CdkCodepipelineLambdaApigwStack extends cdk.Stack {
     const myFunction = new NodejsFunction(this, 'my-function', {
       memorySize: 128,
       timeout: cdk.Duration.seconds(5),
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'handler',
       entry: path.join(__dirname, `/../lambda/app.ts`),
       environment: {

@@ -1,8 +1,9 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
-import { CdkPipeline, SimpleSynthAction } from '@aws-cdk/pipelines';
-import { codepipelineStage } from './codepipeline-stage';
+import { CdkPipeline, ShellStep, SimpleSynthAction, CodePipelineSource, CodePipeline } from '@aws-cdk/pipelines';
+import { pipeline } from 'stream';
+import { codepipelineStage } from './codepipeline-stage'
 
 export class CdkpipelinesStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -10,9 +11,11 @@ export class CdkpipelinesStack extends Stack {
 
     const sourceArtifact = new codepipeline.Artifact();
     const cloudAssemblyArtifact = new codepipeline.Artifact();
+
     const pipeline = new CdkPipeline(this, 'Pipeline', {
       pipelineName: 'MyServicePipeline',
       cloudAssemblyArtifact,
+      
 
       sourceAction: new codepipeline_actions.GitHubSourceAction({
         actionName: 'Github',
@@ -21,16 +24,19 @@ export class CdkpipelinesStack extends Stack {
         owner: 'ShengzhenFu',
         repo: 'cdk-codepipeline-lambda-apigw',
         branch: 'codepipeline',
+        
       }),
-      // build and synthesize
+      
       synthAction: SimpleSynthAction.standardNpmSynth({
         sourceArtifact,
         cloudAssemblyArtifact,
-      // compile typescript lambda
-        buildCommand: 'npm run build'
+        environment: {
+          privileged: true,
+        },        
       }),
     });
-    pipeline.addApplicationStage(new codepipelineStage(this, 'deployAppStage', {
+     
+    pipeline.addApplicationStage(new codepipelineStage(this, 'deployApp', {
       env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
     }))
   }
