@@ -3,8 +3,8 @@ exports.handler=async (event: any)=>{
     const lambda_event=JSON.stringify(event, null, 2);
     console.log("lambda event: "+lambda_event);
     const bodys= {
-        "hello": `request path is ${event.path}`,
-        "hi": `request method is ${event.httpMethod}`
+        "hello cdk": `request path is ${event.path}`,
+        "hi codepipeline": `request method is ${event.httpMethod}`
     };
     const get_response = {
         statusCode: 200,
