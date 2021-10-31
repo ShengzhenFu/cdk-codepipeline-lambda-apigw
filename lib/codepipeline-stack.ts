@@ -2,8 +2,9 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CdkPipeline, ShellStep, SimpleSynthAction, CodePipelineSource, CodePipeline } from '@aws-cdk/pipelines';
-import { pipeline } from 'stream';
+import { LinuxBuildImage } from '@aws-cdk/aws-codebuild';
 import { codepipelineStage } from './codepipeline-stage'
+import { TIMEOUT } from 'dns';
 
 export class CdkpipelinesStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -31,6 +32,7 @@ export class CdkpipelinesStack extends Stack {
         sourceArtifact,
         cloudAssemblyArtifact,
         environment: {
+          buildImage: LinuxBuildImage.STANDARD_5_0,          
           privileged: true,
         },        
       }),
