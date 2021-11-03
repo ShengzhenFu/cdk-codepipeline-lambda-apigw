@@ -2,9 +2,8 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CdkPipeline, ShellStep, SimpleSynthAction, CodePipelineSource, CodePipeline } from '@aws-cdk/pipelines';
-import { LinuxBuildImage } from '@aws-cdk/aws-codebuild';
+import * as  codebuild from '@aws-cdk/aws-codebuild';
 import { codepipelineStage } from './codepipeline-stage'
-import { TIMEOUT } from 'dns';
 
 export class CdkpipelinesStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -30,17 +29,20 @@ export class CdkpipelinesStack extends Stack {
       
       synthAction: SimpleSynthAction.standardNpmSynth({
         sourceArtifact,
-        cloudAssemblyArtifact,
+        cloudAssemblyArtifact,        
         environment: {
-          buildImage: LinuxBuildImage.STANDARD_5_0,          
+          buildImage: codebuild.LinuxBuildImage.STANDARD_5_0,          
           privileged: true,
-        },        
+        },
+        synthCommand: 'npx cdk synth'    
       }),
     });
      
     pipeline.addApplicationStage(new codepipelineStage(this, 'deployApp', {
       env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
-    }))
+    }));
+
+
   }
 }
 
