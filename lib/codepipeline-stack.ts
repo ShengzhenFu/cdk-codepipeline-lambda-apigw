@@ -1,8 +1,8 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
-import { CdkPipeline, ShellStep, SimpleSynthAction, CodePipelineSource, CodePipeline } from '@aws-cdk/pipelines';
-import * as  codebuild from '@aws-cdk/aws-codebuild';
+import { CdkPipeline, SimpleSynthAction } from '@aws-cdk/pipelines';
+import * as codebuild from '@aws-cdk/aws-codebuild';
 import { codepipelineStage } from './codepipeline-stage'
 
 export class CdkpipelinesStack extends Stack {
