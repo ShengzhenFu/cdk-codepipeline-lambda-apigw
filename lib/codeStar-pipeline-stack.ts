@@ -4,6 +4,7 @@ import { ManualApprovalAction } from '@aws-cdk/aws-codepipeline-actions';
 import * as cdk from '@aws-cdk/core';
 import { Stage } from '@aws-cdk/core';
 import { CodePipeline,CodePipelineSource, ManualApprovalStep, CodeBuildStep, ShellStep } from '@aws-cdk/pipelines';
+import { ppid } from 'process';
 import { codepipelineStage } from './codepipeline-stage';
 
 export class codeStarPipelineStack  extends cdk.Stack {
@@ -49,13 +50,15 @@ export class codeStarPipelineStack  extends cdk.Stack {
             region: process.env.CDK_DEFAULT_REGION,
         } });
 
-        
+        const endpointUrl = Prod.urlOutput+'/testPath'
+
         // need approval before deploy app
-        basePipeline.addStage(Prod, {
+        const p = basePipeline.addStage(Prod, {
             pre: [
-                new ManualApprovalStep('approve deploy')
+                new ManualApprovalStep('approve deploy', { comment: `endpoint url ${endpointUrl}`} )
             ]
         });
+        
         // // validate api endpoint after deployed
         // const endpointUrl = Prod.urlOutput+'/testPath'
         // basePipeline.addStage(Prod, {
