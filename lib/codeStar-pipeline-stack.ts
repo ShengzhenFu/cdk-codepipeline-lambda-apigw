@@ -3,7 +3,7 @@ import * as actions from '@aws-cdk/aws-codepipeline-actions';
 import { ManualApprovalAction } from '@aws-cdk/aws-codepipeline-actions';
 import * as cdk from '@aws-cdk/core';
 import { Stage } from '@aws-cdk/core';
-import { CodePipeline,CodePipelineSource, ShellStep, CodeBuildStep } from '@aws-cdk/pipelines';
+import { CodePipeline,CodePipelineSource, ManualApprovalStep, CodeBuildStep, ShellStep } from '@aws-cdk/pipelines';
 import { codepipelineStage } from './codepipeline-stage';
 
 export class codeStarPipelineStack  extends cdk.Stack {
@@ -14,15 +14,15 @@ export class codeStarPipelineStack  extends cdk.Stack {
         // const cloudAssemblyArtifact = new codepipeline.Artifact;
         // const sourceArtifact = new codepipeline.Artifact();
 
-        const serviceSourceAction = new actions.CodeStarConnectionsSourceAction({
-            actionName: 'Service_source',
-            owner: 'ShengzhenFu',
-            repo: 'cdk-codepipeline-lambda-apigw',
-            branch: 'codepipeline',
-            connectionArn: 'arn:aws:codestar-connections:us-west-2:440900076177:connection/26bc6d92-2dda-46b7-aacd-f2a901543f00',
-            codeBuildCloneOutput: true,
-            output: serviceSourceOutput,
-        });
+        // const serviceSourceAction = new actions.CodeStarConnectionsSourceAction({
+        //     actionName: 'Service_source',
+        //     owner: 'ShengzhenFu',
+        //     repo: 'cdk-codepipeline-lambda-apigw',
+        //     branch: 'codepipeline',
+        //     connectionArn: 'arn:aws:codestar-connections:us-west-2:440900076177:connection/26bc6d92-2dda-46b7-aacd-f2a901543f00',
+        //     codeBuildCloneOutput: true,
+        //     output: serviceSourceOutput,
+        // });
         
         const basePipeline = new CodePipeline(this, 'Pipeline', {
             pipelineName: 'WorkshopPipeline',
@@ -44,9 +44,27 @@ export class codeStarPipelineStack  extends cdk.Stack {
         });
 
         
-        // const preProd = basePipeline(new codepipelineStage(this, 'serverlessApp')) 
-        // const deployApprovalAction = new actions.ManualApprovalAction({ actionName: 'Approval', runOrder: 1})
+        const Prod = new codepipelineStage(this, 'serverlessApp', { env: {
+            account: process.env.CDK_DEFAULT_ACCOUNT,
+            region: process.env.CDK_DEFAULT_REGION,
+        } });
+
         
+        // need approval before deploy app
+        basePipeline.addStage(Prod, {
+            pre: [
+                new ManualApprovalStep('approve deploy')
+            ]
+        });
+        // // validate api endpoint after deployed
+        // const endpointUrl = Prod.urlOutput+'/testPath'
+        // basePipeline.addStage(Prod, {
+        //     post: [
+        //         new ShellStep('validate endpoint', {
+        //             commands: [`curl -Ssf ${endpointUrl}`]
+        //         }),
+        //     ],
+        // });
        
     }
 }
